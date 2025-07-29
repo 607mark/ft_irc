@@ -3,8 +3,7 @@
 
 class Client {
   private:
-    std::string _name;
-    const std::string _ID;
+    std::string _nickname;
 
   public:
     Client() = delete;
@@ -14,6 +13,5 @@ class Client {
     bool operator<(Client const& client) const;
 
     std::string getName() const;
-    std::string getId() const;
     void setName(std::string newName);
 };

@@ -3,12 +3,11 @@
 #include <set>
 #include "Client.hpp"
 
-// class Client;
+class Client;
 
 class Channel {
   private:
     std::string _name;
-    const std::string _ID;
     std::string _topic;
     std::set<Client> _users;
     std::set<Client> _operators;
@@ -29,7 +28,6 @@ class Channel {
     std::set<Client> getUsers() const;
     std::set<Client> getOperators() const;
     std::string getName() const;
-    std::string getId() const;
     std::string getTopic() const;
     bool getIsInviteOnly() const;
     bool getIsTopicChangeMode() const;

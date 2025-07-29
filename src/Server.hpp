@@ -22,7 +22,7 @@ private:
   const std::string _PASSWORD;
 
   std::set<Channel> _channels;
-  // std::set<Client> _clients;
+  std::set<Client> _clients;
 
   int _serverSocket;
   struct sockaddr_in _serverAddr;
@@ -47,7 +47,7 @@ public:
   // void removeClient(int clientFd);
 
   std::set<Channel> getChannels() const;
-  // std::set<Client> getClients() const;
+  std::set<Client> getClients() const;
   void addChannel(Channel channel);
-  // void addClient(Client client);
+  void addClient(Client client);
 };

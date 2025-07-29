@@ -1,9 +1,8 @@
 #include "Channel.hpp"
 #include "irc.hpp"
 
-Channel::Channel(std::string name, Client creator): _name(name), _ID(generateRandomId()) {
-  //_operators.insert(creator);
-  (void)creator;
+Channel::Channel(std::string name, Client creator): _name("#" + name) {
+  _operators.insert(creator);
   _topic = "";
   _isInviteOnly = false;
   _isTopicChangeMode = false;
@@ -26,10 +25,6 @@ std::set<Client> Channel::getOperators() const {
 
 std::string Channel::getName() const {
   return _name;
-}
-
-std::string Channel::getId() const {
-  return _ID;
 }
 
 std::string Channel::getTopic() const {
