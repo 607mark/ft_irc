@@ -116,8 +116,28 @@ void Server::run() {
 }
 
 void Server::acceptNewClient() {
-    // TODO: Implement client connection acceptance
-    std::cout << "acceptNewClient() called - not yet implemented" << std::endl;
+    struct sockaddr_in clientAddr; // needed for accept()
+    socklen_t clientAddrLen = sizeof(clientAddr); // needed for accept()
+    
+    // accept the pending connection
+    int clientSocket = accept(_serverSocket, (struct sockaddr*)&clientAddr, &clientAddrLen);
+    
+    if (clientSocket < 0) {
+        if (errno != EWOULDBLOCK && errno != EAGAIN) {
+            std::cerr << "Failed to accept client: " << strerror(errno) << std::endl; // real error
+        }
+        return; // If it was EWOULDBLOCK/EAGAIN, just return
+    }
+    
+    // Add client to poll monitoring
+    struct pollfd clientPoll;
+    clientPoll.fd = clientSocket;
+    clientPoll.events = POLLIN;
+    clientPoll.revents = 0;
+    _pollFds.push_back(clientPoll);
+    
+    std::cout << "New client connected: FD " << clientSocket 
+              << " from " << inet_ntoa(clientAddr.sin_addr) << std::endl;
 }
 
 void Server::handleClientData(int clientFd) {
