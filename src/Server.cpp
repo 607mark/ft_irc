@@ -141,12 +141,33 @@ void Server::acceptNewClient() {
 }
 
 void Server::handleClientData(int clientFd) {
-    // TODO: Implement client data handling
-    std::cout << "handleClientData() called for FD " << clientFd << " - not yet implemented" << std::endl;
+    char buffer[1024]; // TODO: define a constant for buffer size
+
+   
+    ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);  // attempt to read data
+    
+    // handle read errors and disconnections
+    if (bytesRead <= 0) {
+        // == 0  means client closed connection gracefully
+        if (bytesRead == 0) std::cout << "Client FD " << clientFd << " disconnected." << std::endl;
+        else if (errno != EWOULDBLOCK && errno != EAGAIN) {
+            // real error!
+            std::cerr << "Error reading from client FD " << clientFd << ": " 
+                     << strerror(errno) << std::endl;
+        }
+        removeClient(clientFd);
+        return;
+    }
+    buffer[bytesRead] = '\0';
+    std::cout << "Received from client fd " << clientFd << ": " << buffer;
+    
+    // just echo back for now
+    std::string response = "Echo: " + std::string(buffer);
+    send(clientFd, response.c_str(), response.length(), 0);
 }
 
 void Server::removeClient(int clientFd) {
-    // Find the client in the poll with lambda function
+    // Find the client socket in the pollfd vector
     auto it = std::find_if(_pollFds.begin(), _pollFds.end(), [clientFd](const struct pollfd& pfd) {
             return pfd.fd == clientFd;
         });
