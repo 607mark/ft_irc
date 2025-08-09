@@ -43,9 +43,11 @@ public:
   void start();
   void run();
   void stop();
+
+
   void acceptNewClient();
   void handleClientData(int clientFd);
-  // void removeClient(int clientFd);
+  void removeClient(int clientFd);
 
   std::set<Channel> getChannels() const;
   std::set<Client> getClients() const;

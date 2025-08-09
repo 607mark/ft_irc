@@ -102,8 +102,29 @@ void Server::run() {
         }
 
         //handle disconnections here
+        if (_pollFds[i].revents & (POLLHUP | POLLERR)) {
+                if (_pollFds[i].fd != _serverSocket) {
+                    removeClient(_pollFds[i].fd);
+                    --i; // Adjust index 
+                }
+            }
     }
 }
+
+void Server::acceptNewClient() {
+    // TODO: Implement client connection acceptance
+    std::cout << "acceptNewClient() called - not yet implemented" << std::endl;
+}
+
+void Server::handleClientData(int clientFd) {
+    // TODO: Implement client data handling
+    std::cout << "handleClientData() called for FD " << clientFd << " - not yet implemented" << std::endl;
+}
+void Server::removeClient(int clientFd) {
+    // TODO: Implement client removal
+    std::cout << "removeClient() called for FD " << clientFd << " - not yet implemented" << std::endl;
+}
+
 
 
 void Server::stop() {
