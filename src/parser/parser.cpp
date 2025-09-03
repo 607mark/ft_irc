@@ -2,13 +2,17 @@
 
 void validatePassword(const std::string &password)
 {
-    if (password.empty() || password.length() < PASSWORD_MIN_LENGTH)
+    if (password.empty())
     {
-        throw std::out_of_range("Password must have at least " + std::to_string(PASSWORD_MIN_LENGTH));
+        throw std::out_of_range("Password cannot be empty");
+    }
+    else if (password.length() < PASSWORD_MIN_LENGTH)
+    {
+        throw std::out_of_range("Password must have at least " + std::to_string(PASSWORD_MIN_LENGTH) + " characters");
     }
     else if (password.length() > PASSWORD_MAX_LENGTH)
     {
-        throw std::out_of_range("Password can have maximum " + std::to_string(PASSWORD_MAX_LENGTH));
+        throw std::out_of_range("Password can have a maximum of " + std::to_string(PASSWORD_MAX_LENGTH) + " characters");
     }
     else if (password.find_first_of(" \t\n\r") != std::string::npos)
     {
@@ -53,7 +57,6 @@ bool isValidNickname(const std::string &nickName)
 
 // Allowed characters in usernames: letters, digits, - (dash), _ (underscore), . (dot)
 // Not allowed: spaces, control characters, @, !
-
 bool isValidUsername(const std::string &userName)
 {
     const size_t MIN_LEN = 1;
@@ -78,26 +81,6 @@ bool isValidUsername(const std::string &userName)
         return false;
     }
     return true;
-}
-
-void validatePassword(const std::string &password)
-{
-    if (password.empty())
-    {
-        throw std::out_of_range("Password cannot be empty");
-    }
-    else if (password.length() < PASSWORD_MIN_LENGTH)
-    {
-        throw std::out_of_range("Password must have at least " + std::to_string(PASSWORD_MIN_LENGTH) + " characters");
-    }
-    else if (password.length() > PASSWORD_MAX_LENGTH)
-    {
-        throw std::out_of_range("Password can have a maximum of " + std::to_string(PASSWORD_MAX_LENGTH) + " characters");
-    }
-    else if (password.find_first_of(" \t\n\r") != std::string::npos)
-    {
-        throw std::invalid_argument("Password cannot contain whitespaces");
-    }
 }
 
 int validatePort(const std::string &strPort)
