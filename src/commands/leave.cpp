@@ -44,7 +44,7 @@ std::string handlePart(Server *server, const std::vector<std::string> &args, Cli
                           " PART " + channelName;
     if (!partMessage.empty())
         partMsg += " :" + partMessage;
-    partMsg += "\r\n";
+    partMsg += " s\r\n";
 
     // Send PART message to ALL channel members (including the leaving user)
     for (const Client &member : channel->getUsers())
@@ -59,10 +59,10 @@ std::string handlePart(Server *server, const std::vector<std::string> &args, Cli
         channel->removeOperator(client.getFd());
 
     // If channel is empty, remove it
-    if (channel->getUsers().empty())
-    {
-        channels.erase(channelName);
-    }
+    // if (channel->getUsers().empty())
+    // {
+    //     channels.erase(channelName);
+    // }
 
     return "";
 }

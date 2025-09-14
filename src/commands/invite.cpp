@@ -3,11 +3,11 @@
 std::string handleInvite(Server *server, const std::vector<std::string> &args, Client &client)
 {
     // Check registration
-    // if (!client.isRegistered())
-    //     return "451 " + client.getNick() + " :You have not registered\r\n";
+    if (!client.isRegistered())
+        return "451 " + client.getNick() + " :You have not registered\r\n";
 
-    // if (args.size() < 3)
-    //     return "461 " + client.getNick() + " INVITE :Not enough parameters\r\n";
+    if (args.size() < 3)
+        return "461 " + client.getNick() + " INVITE :Not enough parameters\r\n";
 
     std::string targetNick = args[1];
     std::string channelName = args[2];
@@ -29,7 +29,7 @@ std::string handleInvite(Server *server, const std::vector<std::string> &args, C
     if (!channel->hasUser(client))
         return "442 " + client.getNick() + " " + channelName + " :You're not on that channel\r\n";
 
-    // Check if client has operator privileges if channel requires it
+    // Check if client has operator privileges if channel is invite-only
     if (channel->getIsInviteOnly() && !channel->isOperator(client))
         return "482 " + client.getNick() + " " + channelName + " :You're not channel operator\r\n";
 
@@ -42,5 +42,11 @@ std::string handleInvite(Server *server, const std::vector<std::string> &args, C
     if (channel->hasUser(*targetClient))
         return "443 " + client.getNick() + " " + targetNick + " " + channelName + " :is already on channel\r\n";
 
-    return ("all good");
+    // Send invite message to target user
+    std::string inviteMsg = ":" + client.getNick() + "!" + client.getUsername() + "@localhost" +
+                            " INVITE " + targetNick + " " + channelName + "\r\n";
+    send(targetClient->getFd(), inviteMsg.c_str(), inviteMsg.length(), 0);
+
+    // Send confirmation to inviter (RPL_INVITING - 341)
+    return "341 " + client.getNick() + " " + targetNick + " " + channelName + "\r\n";
 }

@@ -6,7 +6,7 @@ std::string handleInput(const std::string &input, Server *server, int clientFd)
 	std::string result = "";
 	try
 	{
-
+		std::cout << "DEBUG: Received input: '" << input << "'" << std::endl;
 		std::vector<std::string> args = split(input, ' ');
 		if (args.empty())
 			return "";
