@@ -52,6 +52,17 @@ std::string handleInput(const std::string &input, Server *server, int clientFd)
 			}
 			break;
 
+		case hash("leave"):
+		case hash("part"):
+			if (args.size() < 2)
+				result = "461 PART :Not enough parameters\r\n";
+			else
+			{
+				std::cout << "leaving channel..." << args.at(1) << std::endl;
+				result = handlePart(server, args, client);
+			}
+			break;
+
 		default:
 			break;
 		}

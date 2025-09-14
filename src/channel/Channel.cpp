@@ -209,3 +209,27 @@ bool Channel::isOperator(const Client &user) const
 {
   return _operators.find(user) != _operators.end();
 }
+
+void Channel::removeUser(int clientFd)
+{
+  auto it = std::find_if(_users.begin(), _users.end(),
+                         [clientFd](const Client &client)
+                         {
+                           return client.getFd() == clientFd;
+                         });
+
+  if (it != _users.end())
+    _users.erase(it);
+}
+
+void Channel::removeOperator(int clientFd)
+{
+  auto it = std::find_if(_operators.begin(), _operators.end(),
+                         [clientFd](const Client &client)
+                         {
+                           return client.getFd() == clientFd;
+                         });
+
+  if (it != _operators.end())
+    _operators.erase(it);
+}

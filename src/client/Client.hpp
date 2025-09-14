@@ -67,4 +67,6 @@ public:
   void popMessage() { _writeQueue.pop_front(); }
 
   bool isRegistered() const { return registered; }
+
+  std::string getUsername() const { return _username; }
 };

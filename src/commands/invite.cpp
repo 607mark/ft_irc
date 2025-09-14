@@ -3,8 +3,8 @@
 std::string handleInvite(Server *server, const std::vector<std::string> &args, Client &client)
 {
     // Check registration
-    if (!client.isRegistered())
-        return "451 " + client.getNick() + " :You have not registered\r\n";
+    // if (!client.isRegistered())
+    //     return "451 " + client.getNick() + " :You have not registered\r\n";
 
     // if (args.size() < 3)
     //     return "461 " + client.getNick() + " INVITE :Not enough parameters\r\n";

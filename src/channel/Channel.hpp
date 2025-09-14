@@ -61,4 +61,7 @@ public:
   void setIsInviteOnly(bool newMode);
   void setIsTopicRestricted(bool newMode);
   void setUserLimit(int newLimit);
+
+  void removeUser(int clientFd);
+  void removeOperator(int clientFd);
 };

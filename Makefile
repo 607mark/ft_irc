@@ -41,6 +41,7 @@ COMMANDS_FILES = \
 	user.cpp \
 	who.cpp \
 	invite.cpp \
+	leave.cpp
 
 PARSER_FILES = \
 	parser.cpp
