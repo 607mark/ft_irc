@@ -22,6 +22,15 @@
 
 class Server;
 
+struct messageInfo
+{
+    std::string target;
+    std::shared_ptr<Client> sender;
+    std::string senderNick;
+    int senderFd;
+    std::string message;
+};
+
 // parser.cpp
 void validateClientPassword(const std::string &inputPassword, const std::string &storedPassword);
 void validatePassword(const std::string &password);
