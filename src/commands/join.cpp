@@ -20,6 +20,25 @@ std::string handleJoin(Server *server, const std::vector<std::string> &args, std
 	try
 	{
 		std::shared_ptr<Channel> channel = server->getChannelByName(channelName);
+
+		// Check if channel is invite-only and user is not invited
+		if (channel->getIsInviteOnly() && !channel->isInvited(client))
+		{
+			return "473 " + nickname + " " + channelName + " :Cannot join channel (+i)\r\n";
+		}
+
+		// Check user limit
+		if (channel->getUserLimit() > 0 && channel->getUsers().size() >= channel->getUserLimit())
+		{
+			return "471 " + nickname + " " + channelName + " :Cannot join channel (+l)\r\n";
+		}
+
+		// Remove from invite list if invited (invitation is consumed)
+		if (channel->isInvited(client))
+		{
+			channel->removeInvite(client);
+		}
+
 		channel->addUser(client);
 
 		std::string prefix = generatePrefix(client);

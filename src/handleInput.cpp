@@ -115,6 +115,11 @@ void handleInput(std::string input, Server *server, int clientFd)
 		// leave
 		case hash("part"):
 			result = handlePart(server, args, client, msg);
+
+		case hash("invite"):
+			result = handleInvite(server, args, client);
+			break;
+
 		default:
 			break;
 		}

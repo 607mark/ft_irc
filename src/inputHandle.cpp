@@ -1,26 +1,51 @@
 #include "irc.hpp"
 #include "commands/commands.hpp"
+#include "Server.hpp"
 
-std::string handleInput(const std::string &input, Server *server, int clientFd)
+std::vector<std::string> trimSplitInput(std::string &input, std::string &msg)
+{
+	// remove carriage return characters
+	input.pop_back();
+	std::vector<std::string> args;
+	std::vector<std::string> splittedMsg = split(input, ':');
+
+	if (splittedMsg.size() > 1)
+	{
+		args = split(splittedMsg.at(0), ' ');
+		msg = splittedMsg.at(1);
+	}
+	else
+	{
+		args = split(input, ' ');
+	}
+
+	if (args.empty())
+		return args;
+
+	if (args.at(0).starts_with('/'))
+	{
+		args.at(0).erase(args.at(0).begin());
+	}
+	return args;
+}
+
+void handleInput(std::string input, Server *server, Logger *logger, int clientFd)
 {
 	std::string result = "";
 	try
 	{
-		std::cout << "DEBUG: Received input: '" << input << "'" << std::endl;
-		std::vector<std::string> args = split(input, ' ');
+		std::string msg = "";
+		std::vector<std::string> args = trimSplitInput(input, msg);
 		if (args.empty())
-			return "";
-
-		if (args.at(0).starts_with('/'))
-		{
-			args.at(0).erase(args.at(0).begin());
-		}
+			return;
 
 		std::string cmdLowercase = strToLowercase(args.at(0));
 
 		validateCommand(cmdLowercase);
 
-		Client &client = server->getClients().at(clientFd);
+		std::shared_ptr<Client> client = server->getClients().at(clientFd);
+
+		std::string storedPassword = server->getPassword();
 
 		switch (hash(cmdLowercase.c_str(), cmdLowercase.size()))
 		{
@@ -32,14 +57,13 @@ std::string handleInput(const std::string &input, Server *server, int clientFd)
 			break;
 
 		case hash("user"):
-			if (args.size() < 5) // RFC requires 4 params
+			if (args.size() < 4)
 				result = "461 USER :Not enough parameters\r\n";
 			else
-				result = handleUser(client, args);
+				result = handleUser(client, args, msg);
 			break;
 
 		case hash("join"):
-			std::cout << "joining..." << args.at(1) << std::endl;
 			result = handleJoin(server, args, client);
 			break;
 		case hash("invite"):
@@ -63,13 +87,56 @@ std::string handleInput(const std::string &input, Server *server, int clientFd)
 			}
 			break;
 
+		case hash("privmsg"):
+			handlePrivmsg(server, args, clientFd, msg);
+			return;
+
+		case hash("pass"):
+			if (args.size() < 2)
+			{
+				result = "461 PASS :Not enough parameters\r\n";
+			}
+			else
+			{
+				try
+				{
+					logger->debug(AUTH, "Validating password...");
+					validateClientPassword(args[1], storedPassword);
+					result = "Password accepted\r\n";
+					logger->info(AUTH, "Authenticated " + client->getNick() + "!");
+				}
+				catch (const std::exception &e)
+				{
+					logger->error(AUTH, "Password validation failed");
+					result = std::string("464 PASS :") + e.what() + "\r\n";
+				}
+			}
+			break;
+		case hash("ping"):
+			result = handlePing(args);
+			break;
+
+		case hash("topic"):
+			result = handleTopic(server, args, msg, client);
+			break;
+
+		case hash("mode"):
+			result = handleMode(server, args, client);
+			break;
+
+		case hash("who"):
+			result = handleWho(server, args, client);
+			break;
 		default:
 			break;
 		}
+		if (result.empty())
+			return;
+		client->enqueueMessage(result);
+		server->enableWrite(clientFd);
 	}
 	catch (std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-	return result;
 }

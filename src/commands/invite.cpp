@@ -1,52 +1,68 @@
 #include "commands.hpp"
 
-std::string handleInvite(Server *server, const std::vector<std::string> &args, Client &client)
+std::string handleInvite(Server *server, const std::vector<std::string> &args, std::shared_ptr<Client> client)
 {
     // Check registration
-    if (!client.isRegistered())
-        return "451 " + client.getNick() + " :You have not registered\r\n";
+    if (!client->isRegistered())
+        return "451 INVITE :You have not registered\r\n";
 
+    // Check parameters
     if (args.size() < 3)
-        return "461 " + client.getNick() + " INVITE :Not enough parameters\r\n";
+        return "461 INVITE :Not enough parameters\r\n";
 
-    std::string targetNick = args[1];
-    std::string channelName = args[2];
+    std::string targetNick = args.at(1);
+    std::string channelName = args.at(2);
+    std::string senderNick = client->getNick();
 
     // Validate channel name
     if (!isValidChannelName(channelName))
-        return "403 " + client.getNick() + " " + channelName + " :No such channel\r\n";
+        return "476 " + senderNick + " " + channelName + " :Bad Channel Mask\r\n";
 
-    auto channels = server->getChannels();
-    auto channelIt = channels.find(channelName);
+    // Check if channel exists
+    std::shared_ptr<Channel> channel;
+    try
+    {
+        channel = server->getChannelByName(channelName);
+    }
+    catch (...)
+    {
+        return "403 " + senderNick + " " + channelName + " :No such channel\r\n";
+    }
 
-    // Channel must exist
-    if (channelIt == channels.end())
-        return "403 " + client.getNick() + " " + channelName + " :No such channel\r\n";
+    // Check if sender is on the channel
+    if (!channel->isMember(client))
+        return "442 " + senderNick + " " + channelName + " :You're not on that channel\r\n";
 
-    std::shared_ptr<Channel> channel = channelIt->second;
-
-    // Client must be on the channel to invite others
-    if (!channel->hasUser(client))
-        return "442 " + client.getNick() + " " + channelName + " :You're not on that channel\r\n";
-
-    // Check if client has operator privileges if channel is invite-only
+    // Check if sender is operator (required for invite-only channels)
     if (channel->getIsInviteOnly() && !channel->isOperator(client))
-        return "482 " + client.getNick() + " " + channelName + " :You're not channel operator\r\n";
+        return "482 " + senderNick + " " + channelName + " :You're not channel operator\r\n";
 
-    // Find the target client
-    std::shared_ptr<Client> targetClient = server->findClientByNick(targetNick);
+    // Find target client
+    std::shared_ptr<Client> targetClient = nullptr;
+    for (const auto &clientPair : server->getClients())
+    {
+        if (clientPair.second->getNick() == targetNick)
+        {
+            targetClient = clientPair.second;
+            break;
+        }
+    }
+
     if (!targetClient)
-        return "401 " + client.getNick() + " " + targetNick + " :No such nick\r\n";
+        return "401 " + senderNick + " " + targetNick + " :No such nick/channel\r\n";
 
-    // Check if target is already on the channel
-    if (channel->hasUser(*targetClient))
-        return "443 " + client.getNick() + " " + targetNick + " " + channelName + " :is already on channel\r\n";
+    // Check if target is already on channel
+    if (channel->isMember(targetClient))
+        return "443 " + senderNick + " " + targetNick + " " + channelName + " :is already on channel\r\n";
 
-    // Send invite message to target user
-    std::string inviteMsg = ":" + client.getNick() + "!" + client.getUsername() + "@localhost" +
-                            " INVITE " + targetNick + " " + channelName + "\r\n";
-    send(targetClient->getFd(), inviteMsg.c_str(), inviteMsg.length(), 0);
+    // Add target to invite list
+    channel->addInvite(targetClient);
 
-    // Send confirmation to inviter (RPL_INVITING - 341)
-    return "341 " + client.getNick() + " " + targetNick + " " + channelName + "\r\n";
+    // Send invitation to target client
+    std::string inviteMsg = ":" + senderNick + " INVITE " + targetNick + " " + channelName + "\r\n";
+    targetClient->enqueueMessage(inviteMsg);
+    server->enableWrite(targetClient->getFd());
+
+    // Send confirmation to sender
+    return "341 " + senderNick + " " + targetNick + " " + channelName + "\r\n";
 }
