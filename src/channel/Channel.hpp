@@ -61,7 +61,4 @@ public:
   void setIsInviteOnly(bool newMode);
   void setIsTopicRestricted(bool newMode);
   void setUserLimit(int newLimit);
-
-  bool hasUser(std::shared_ptr<Client> client) const;
-  void removeUser(std::shared_ptr<Client> client);
 };

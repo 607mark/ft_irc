@@ -40,8 +40,7 @@ COMMANDS_FILES = \
 	topic.cpp \
 	user.cpp \
 	who.cpp \
-	invite.cpp \
-	leave.cpp
+	invite.cpp 
 
 PARSER_FILES = \
 	parser.cpp

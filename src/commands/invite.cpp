@@ -30,7 +30,7 @@ std::string handleInvite(Server *server, const std::vector<std::string> &args, s
     }
 
     // Check if sender is on the channel
-    if (!channel->isMember(client))
+    if (!channel->hasUser(client))
         return "442 " + senderNick + " " + channelName + " :You're not on that channel\r\n";
 
     // Check if sender is operator (required for invite-only channels)
@@ -52,7 +52,7 @@ std::string handleInvite(Server *server, const std::vector<std::string> &args, s
         return "401 " + senderNick + " " + targetNick + " :No such nick/channel\r\n";
 
     // Check if target is already on channel
-    if (channel->isMember(targetClient))
+    if (channel->hasUser(targetClient))
         return "443 " + senderNick + " " + targetNick + " " + channelName + " :is already on channel\r\n";
 
     // Add target to invite list

@@ -200,7 +200,7 @@ void Channel::removeOperator(std::shared_ptr<Client> oldOperator)
 void Channel::addInvite(std::shared_ptr<Client> client)
 {
   // Don't invite if already a member or already invited
-  if (!isMember(client) && !isInvited(client))
+  if (!hasUser(client) && !isInvited(client))
   {
     _inviteList.push_back(client);
   }
@@ -233,20 +233,4 @@ void Channel::setIsTopicRestricted(bool newMode)
 void Channel::setUserLimit(int newLimit)
 {
   _userLimit = newLimit;
-}
-
-bool Channel::hasUser(std::shared_ptr<Client> client) const
-{
-  // Check if the client exists in the _users vector
-  return std::find(_users.begin(), _users.end(), client) != _users.end();
-}
-
-void Channel::removeUser(std::shared_ptr<Client> client)
-{
-  // Remove the client from the _users vector
-  auto it = std::find(_users.begin(), _users.end(), client);
-  if (it != _users.end())
-  {
-    _users.erase(it);
-  }
 }
