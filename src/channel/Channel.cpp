@@ -202,20 +202,28 @@ void Channel::setUserLimit(int newLimit)
 
 bool Channel::hasUser(const Client &user) const
 {
-  return _users.find(user) != _users.end();
+  return std::find_if(_users.begin(), _users.end(),
+                      [&user](const std::shared_ptr<Client> &client)
+                      {
+                        return client->getFd() == user.getFd();
+                      }) != _users.end();
 }
 
 bool Channel::isOperator(const Client &user) const
 {
-  return _operators.find(user) != _operators.end();
+  return std::find_if(_operators.begin(), _operators.end(),
+                      [&user](const std::shared_ptr<Client> &client)
+                      {
+                        return client->getFd() == user.getFd();
+                      }) != _operators.end();
 }
 
 void Channel::removeUser(int clientFd)
 {
   auto it = std::find_if(_users.begin(), _users.end(),
-                         [clientFd](const Client &client)
+                         [clientFd](const std::shared_ptr<Client> &client)
                          {
-                           return client.getFd() == clientFd;
+                           return client->getFd() == clientFd;
                          });
 
   if (it != _users.end())
@@ -225,9 +233,9 @@ void Channel::removeUser(int clientFd)
 void Channel::removeOperator(int clientFd)
 {
   auto it = std::find_if(_operators.begin(), _operators.end(),
-                         [clientFd](const Client &client)
+                         [clientFd](const std::shared_ptr<Client> &client)
                          {
-                           return client.getFd() == clientFd;
+                           return client->getFd() == clientFd;
                          });
 
   if (it != _operators.end())

@@ -388,13 +388,13 @@ void Server::stop()
     logger->success(SERVER, "Successfully shut down IRC server.");
 }
 
-Client *Server::findClientByNick(const std::string &nick)
+std::shared_ptr<Client> Server::findClientByNick(const std::string &nick)
 {
     for (auto &pair : _clients)
     {
-        if (pair.second.getNick() == nick)
+        if (pair.second->getNick() == nick)
         {
-            return &pair.second;
+            return pair.second;
         }
     }
     return nullptr;

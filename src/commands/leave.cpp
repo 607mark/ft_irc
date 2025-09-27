@@ -26,7 +26,7 @@ std::string handlePart(Server *server, const std::vector<std::string> &args, Cli
             partMessage = partMessage.substr(1);
     }
 
-    auto &channels = server->getChannels();
+    auto channels = server->getChannels();
     auto channelIt = channels.find(channelName);
 
     // Channel must exist
@@ -47,9 +47,9 @@ std::string handlePart(Server *server, const std::vector<std::string> &args, Cli
     partMsg += " s\r\n";
 
     // Send PART message to ALL channel members (including the leaving user)
-    for (const Client &member : channel->getUsers())
+    for (const std::shared_ptr<Client> &member : channel->getUsers())
     {
-        send(member.getFd(), partMsg.c_str(), partMsg.length(), 0);
+        send(member->getFd(), partMsg.c_str(), partMsg.length(), 0);
     }
 
     channel->removeUser(client.getFd());

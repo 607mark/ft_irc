@@ -16,7 +16,7 @@ std::string handleInvite(Server *server, const std::vector<std::string> &args, C
     if (!isValidChannelName(channelName))
         return "403 " + client.getNick() + " " + channelName + " :No such channel\r\n";
 
-    auto &channels = server->getChannels();
+    auto channels = server->getChannels();
     auto channelIt = channels.find(channelName);
 
     // Channel must exist
@@ -34,7 +34,7 @@ std::string handleInvite(Server *server, const std::vector<std::string> &args, C
         return "482 " + client.getNick() + " " + channelName + " :You're not channel operator\r\n";
 
     // Find the target client
-    Client *targetClient = server->findClientByNick(targetNick);
+    std::shared_ptr<Client> targetClient = server->findClientByNick(targetNick);
     if (!targetClient)
         return "401 " + client.getNick() + " " + targetNick + " :No such nick\r\n";
 
