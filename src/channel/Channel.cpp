@@ -92,6 +92,18 @@ bool Channel::isOperator(std::shared_ptr<Client> client) const
   return false;
 }
 
+bool Channel::isInvited(std::shared_ptr<Client> client) const
+{
+  for (auto &invitedUser : _inviteList)
+  {
+    if (invitedUser->getNick() == client->getNick())
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void Channel::broadcast(Server *server, const std::string &rawMessage, int excludeFd)
 {
   for (auto &member : _users)
@@ -183,6 +195,29 @@ void Channel::removeOperator(std::shared_ptr<Client> oldOperator)
 
   if (it != _operators.end())
     _operators.erase(it);
+}
+
+void Channel::addInvite(std::shared_ptr<Client> client)
+{
+  // Don't invite if already a member or already invited
+  if (!hasUser(client) && !isInvited(client))
+  {
+    _inviteList.push_back(client);
+  }
+}
+
+void Channel::removeInvite(std::shared_ptr<Client> client)
+{
+  auto it = std::find_if(
+      _inviteList.begin(),
+      _inviteList.end(),
+      [&](const std::shared_ptr<Client> &invitedUser)
+      {
+        return invitedUser->getFd() == client->getFd();
+      });
+
+  if (it != _inviteList.end())
+    _inviteList.erase(it);
 }
 
 void Channel::setIsInviteOnly(bool newMode)

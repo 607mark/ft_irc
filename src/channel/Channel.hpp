@@ -18,6 +18,7 @@ private:
   std::string _key;
   std::vector<std::shared_ptr<Client>> _users;
   std::vector<std::shared_ptr<Client>> _operators;
+  std::vector<std::shared_ptr<Client>> _inviteList;
 
   // Modes
   bool _isInviteOnly;
@@ -41,6 +42,7 @@ public:
   size_t getUserLimit() const;
   bool hasUser(std::shared_ptr<Client> client) const;
   bool isOperator(std::shared_ptr<Client> client) const;
+  bool isInvited(std::shared_ptr<Client> client) const;
   void broadcast(Server *server, const std::string &rawMessage, int excludeFd);
   std::string getNamesReply(const std::string &requesterNick) const;
   bool isEmpty() const;
@@ -54,6 +56,8 @@ public:
   void addOperator(std::shared_ptr<Client> newOperator);
   void removeUser(std::shared_ptr<Client> oldUser);
   void removeOperator(std::shared_ptr<Client> oldOperator);
+  void addInvite(std::shared_ptr<Client> client);
+  void removeInvite(std::shared_ptr<Client> client);
   void setIsInviteOnly(bool newMode);
   void setIsTopicRestricted(bool newMode);
   void setUserLimit(int newLimit);

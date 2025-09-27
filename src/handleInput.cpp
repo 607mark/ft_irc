@@ -66,6 +66,26 @@ void handleInput(std::string input, Server *server, int clientFd)
 		case hash("join"):
 			result = handleJoin(server, args, client);
 			break;
+		case hash("invite"):
+			if (args.size() < 3)
+				result = "461 INVITE :Not enough parameters\r\n";
+			else
+			{
+				std::cout << "inviting..." << args.at(1) << std::endl;
+				result = handleInvite(server, args, client);
+			}
+			break;
+
+		case hash("leave"):
+		case hash("part"):
+			if (args.size() < 2)
+				result = "461 PART :Not enough parameters\r\n";
+			else
+			{
+				std::cout << "leaving channel..." << args.at(1) << std::endl;
+				result = handlePart(server, args, client, msg);
+			}
+			break;
 
 		case hash("privmsg"):
 			handlePrivmsg(server, args, clientFd, msg);
@@ -107,14 +127,9 @@ void handleInput(std::string input, Server *server, int clientFd)
 		case hash("who"):
 			result = handleWho(server, args, client);
 			break;
-
 		case hash("kick"):
 			result = handleKick(server, args, client, msg);
 			break;
-
-		// leave
-		case hash("part"):
-			result = handlePart(server, args, client, msg);
 		default:
 			break;
 		}
