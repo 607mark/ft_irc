@@ -104,15 +104,12 @@ void handleInput(std::string input, Server *server, int clientFd)
 		case hash("ping"):
 			result = handlePing(args);
 			break;
-
 		case hash("topic"):
 			result = handleTopic(server, args, msg, client);
 			break;
-
 		case hash("mode"):
 			result = handleMode(server, args, client);
 			break;
-
 		case hash("who"):
 			result = handleWho(server, args, client);
 			break;
