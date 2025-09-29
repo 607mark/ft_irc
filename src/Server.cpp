@@ -296,19 +296,19 @@ void Server::handleClientData(int clientFd)
     // Append the received data to the buffer
     client->getBuffer().append(buffer);
 
-    std::cout << "BUFFER NOW: [" << client->getBuffer() << "]" << std::endl;
-
     for (std::string::size_type pos; (pos = client->getBuffer().find("\n")) != std::string::npos;)
     {
-        std::cout << "FOUND MESSAGE: [" << client->getBuffer() << "]" << std::endl;
         std::string message = client->getBuffer().substr(0, pos);
-        client->getBuffer().erase(0, pos + 1);
+        client->getBuffer().erase(0, pos + 2);
 
         // Process the complete command
         std::vector<std::string> cmds = split(message, '\n');
+
+        for (std::string &str : cmds)
+            std::cout << "SPLIT CMD: [" << str << "]" << std::endl;
         for (const std::string &cmd : cmds)
         {
-            if (!cmd.empty() && cmd.ends_with("\n")) // Skip empty commands
+            if (!cmd.empty()) // Skip empty commands
             {
                 handleInput(cmd, this, clientFd);
             }
