@@ -299,13 +299,10 @@ void Server::handleClientData(int clientFd)
     for (std::string::size_type pos; (pos = client->getBuffer().find("\n")) != std::string::npos;)
     {
         std::string message = client->getBuffer().substr(0, pos);
-        client->getBuffer().erase(0, pos + 2);
+        client->getBuffer().erase(0, pos + 1);
 
         // Process the complete command
         std::vector<std::string> cmds = split(message, '\n');
-
-        for (std::string &str : cmds)
-            std::cout << "SPLIT CMD: [" << str << "]" << std::endl;
         for (const std::string &cmd : cmds)
         {
             if (!cmd.empty()) // Skip empty commands
