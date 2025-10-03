@@ -6,17 +6,11 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include "../channel/Channel.hpp"
-#include "../client/Client.hpp"
-#include "../irc.hpp"
-#include "../logger/Logger.hpp"
-
-#define SERVER_BACKLOG 10 // max number of pending connections
-#ifndef SOCK_NONBLOCK
-#define SOCK_NONBLOCK 2
-#endif
+#include "../common/socket_utils.hpp"
 
 class Channel;
+class Client;
+class Logger;
 
 class Server
 {
@@ -67,31 +61,21 @@ public:
   std::shared_ptr<Client> getClientByFd(const int &fd);
   std::shared_ptr<Channel> getChannelByName(const std::string &channelName);
   bool hasNick(const std::string &nick) const;
+  
+  // Safe client lookup methods
+  std::shared_ptr<Client> findClientByNick(const std::string &nick) const;
+  std::shared_ptr<Client> findClientByFd(const int &fd) const;
 
   void addChannel(const std::string &channelName, std::shared_ptr<Channel> channel);
   void addClient(int fd, Client client);
 
   void enableWrite(int clientFd)
   {
-    for (size_t i = 0; i < _pollFds.size(); ++i)
-    {
-      if (_pollFds.at(i).fd == clientFd)
-      {
-        _pollFds.at(i).events |= POLLOUT;
-        break;
-      }
-    }
+    SocketUtils::enableWrite(_pollFds, clientFd);
   }
 
   void disableWrite(int fd)
   {
-    for (size_t i = 0; i < _pollFds.size(); ++i)
-    {
-      if (_pollFds.at(i).fd == fd)
-      {
-        _pollFds.at(i).events &= ~POLLOUT;
-        return;
-      }
-    }
+    SocketUtils::disableWrite(_pollFds, fd);
   }
 };

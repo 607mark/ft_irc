@@ -43,9 +43,10 @@ CHANNEL_DIR		= channel
 CLIENT_DIR		= client
 COMMANDS_DIR	= commands
 LOGGER_DIR		= logger
-PARSER_DIR		= parser
+PARSER_DIR		= validation
 SERVER_DIR		= server
 UTILS_DIR		= utils
+COMMON_DIR		= common
 
 CHANNEL_FILES = Channel.cpp
 CLIENT_FILES = Client.cpp
@@ -68,13 +69,14 @@ COMMANDS_FILES = \
 	whois.cpp
 
 PARSER_FILES = \
-	parser.cpp
+	validation.cpp
 
 UTILS_FILES = \
 	responsePrefix.cpp \
-	utils.cpp \
-	validateChannelName.cpp \
-	validateClientName.cpp
+	utils.cpp
+
+COMMON_FILES = \
+	socket_utils.cpp
 
 SRC_FILES = \
 	$(addprefix $(CHANNEL_DIR)/, $(CHANNEL_FILES)) \
@@ -84,6 +86,7 @@ SRC_FILES = \
 	$(addprefix $(PARSER_DIR)/, $(PARSER_FILES)) \
 	$(addprefix $(SERVER_DIR)/, $(SERVER_FILES)) \
 	$(addprefix $(UTILS_DIR)/, $(UTILS_FILES)) \
+	$(addprefix $(COMMON_DIR)/, $(COMMON_FILES)) \
 	handleInput.cpp \
 	main.cpp \
 
