@@ -43,7 +43,7 @@ CHANNEL_DIR		= channel
 CLIENT_DIR		= client
 COMMANDS_DIR	= commands
 LOGGER_DIR		= logger
-PARSER_DIR		= validation
+VALIDATION_DIR	= validation
 SERVER_DIR		= server
 UTILS_DIR		= utils
 COMMON_DIR		= common
@@ -68,7 +68,7 @@ COMMANDS_FILES = \
 	who.cpp \
 	whois.cpp
 
-PARSER_FILES = \
+VALIDATION_FILES = \
 	validation.cpp
 
 UTILS_FILES = \
@@ -83,7 +83,7 @@ SRC_FILES = \
 	$(addprefix $(CLIENT_DIR)/, $(CLIENT_FILES)) \
 	$(addprefix $(COMMANDS_DIR)/, $(COMMANDS_FILES)) \
 	$(addprefix $(LOGGER_DIR)/, $(LOGGER_FILES)) \
-	$(addprefix $(PARSER_DIR)/, $(PARSER_FILES)) \
+	$(addprefix $(VALIDATION_DIR)/, $(VALIDATION_FILES)) \
 	$(addprefix $(SERVER_DIR)/, $(SERVER_FILES)) \
 	$(addprefix $(UTILS_DIR)/, $(UTILS_FILES)) \
 	$(addprefix $(COMMON_DIR)/, $(COMMON_FILES)) \
